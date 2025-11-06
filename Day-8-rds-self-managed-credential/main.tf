@@ -7,6 +7,7 @@ resource "aws_db_instance" "master" {
   instance_class          = "db.t3.micro"
   username                = "admin"
   password                = "Cloud123"
+  publicly_accessible     = false
   db_subnet_group_name    = aws_db_subnet_group.sub-grp.id
   parameter_group_name    = "default.mysql8.0"
 
@@ -26,7 +27,7 @@ resource "aws_db_instance" "master" {
   maintenance_window = "sun:04:00-sun:05:00"  # Maintenance every Sunday (UTC)
 
   # Enable deletion protection (to prevent accidental deletion)
-  #deletion_protection = true
+  deletion_protection = false
 
   # Skip final snapshot
   skip_final_snapshot = true
@@ -88,10 +89,10 @@ resource "aws_db_subnet_group" "sub-grp" {
 
 
 #create read replica
-resource "aws_db_instance" "replica" {
-  identifier               = "my-read-replica"
-  replicate_source_db      = aws_db_instance.master.identifier
-  instance_class           = "db.t3.micro"
-  publicly_accessible      = false
-  skip_final_snapshot      = true
-}
+# resource "aws_db_instance" "replica" {
+#   identifier               = "my-read-replica"
+#   replicate_source_db      = aws_db_instance.master.identifier
+#   instance_class           = "db.t3.micro"
+#   publicly_accessible      = false
+#   skip_final_snapshot      = true
+# }

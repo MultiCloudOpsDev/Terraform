@@ -63,10 +63,6 @@ resource "null_resource" "remote_sql_exec" {
        # Install MySQL client if not already installed
       "sudo dnf install -y mariadb105 || true",
       # Run SQL script
-    #     "mysql -h ${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["host"]} " 
-    #   + "-u ${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["username"]} " 
-    #   + "-p${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["password"]} "
-    #   + "${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["dbname"]} < /tmp/init.sql"
     "mysql -h ${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["host"]} -u ${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["username"]} -p${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["password"]} ${jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["dbname"]} < /tmp/init.sql"
     
      ]

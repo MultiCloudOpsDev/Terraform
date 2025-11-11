@@ -35,10 +35,6 @@ data "aws_secretsmanager_secret_version" "db_secret_version" {
   depends_on = [aws_secretsmanager_secret_version.db_secret_value]
 }
 
-# locals {
-#   db_credentials = jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)
-# }
-
 # ---- Run SQL on RDS from EC2 ----
 resource "null_resource" "remote_sql_exec" {
   depends_on = [

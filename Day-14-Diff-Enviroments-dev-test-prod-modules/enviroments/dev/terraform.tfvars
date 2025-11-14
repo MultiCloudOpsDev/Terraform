@@ -1,0 +1,8 @@
+ami_id = "ami-0cae6d6fe6048ca2c"
+instance_type = "t3.micro"
+availability_zone = "us-east-1a"
+tags = "dev"
+subnet_id = "10.0.1.0/24"
+vpc_cidr = "10.0.0.0/16"
+bucket_name ="mybucketdevuser111" 
+region = "us-east-1"

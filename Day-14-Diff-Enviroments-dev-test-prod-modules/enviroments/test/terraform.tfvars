@@ -1,0 +1,8 @@
+ami_id = "ami-03ff9720b16e8da76"
+instance_type = "t3.micro"
+availability_zone = "us-west-1a"
+tags = "test"
+subnet_id = "10.0.3.0/24"
+vpc_cidr = "10.0.0.0/16"
+bucket_name ="mybuckettestuserwest12345" 
+region = "us-west-1"

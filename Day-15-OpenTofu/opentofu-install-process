@@ -1,0 +1,96 @@
+
+################## Installation ####################
+winget install --exact --id=OpenTofu.Tofu
+
+
+
+
+
+
+
+############# Migrating process ###########
+Migrating to OpenTofu from Terraform 1.9.x
+When migrating from Terraform 1.9.x, please migrate to OpenTofu 1.9.0 first, then upgrade your OpenTofu installation to the latest version.
+
+OpenTofu 1.9.0 is largely compatible with Terraform 1.9.x with a few minor changes needed. This migration guide will take you through the process of switching from Terraform to OpenTofu.
+
+Step 0: Prepare a disaster recovery plan
+Although OpenTofu 1.9.0 is very similar to Terraform 1.9.8, make sure you have an up to date and tested disaster recovery plan.
+
+Step 1: Upgrading Terraform
+This migration guide is only valid for Terraform 1.9.8. If you are on a Terraform version below 1.9.8, please upgrade to at least Terraform version 1.9.8 before proceeding with the migration by following the Terraform upgrade guide. If you are on a higher Terraform version, please wait until an appropriate migration guide becomes available.
+
+Step 2: Apply all changes with Terraform
+Before proceeding, make sure that you apply all changes with terraform apply. Running terraform plan should result in no planned changes. While you can switch to OpenTofu with pending changes, it is not recommended.
+
+Code Block
+$ terraform plan
+
+...
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your
+configuration and found no differences, so no changes are needed.
+Step 3: Install OpenTofu 1.9.0
+As a first step, please follow the installation instructions for the OpenTofu CLI tool. Please test if you can successfully execute the tofu command:
+
+Code Block
+$ tofu --version
+OpenTofu v1.9.0
+on linux_amd64
+Step 4: Back up your state file and code
+Before you begin using the tofu binary on your Terraform code, make sure to back up your state file. If you are using a local state file, you can simply make a copy of your terraform.tfstate file in your project directory.
+
+If you are using a remote backend such as an S3 bucket, make sure that you follow the backup procedures for the backend and that you exercise the restore procedure at least once.
+
+Additionally, make sure you back up or version your code as the migration will require some code changes.
+
+Step 5: Code changes
+For a successful migration, you will need to perform the following code changes
+
+Functions
+The following functions are not supported in OpenTofu:
+
+encode_tfvars
+decode_tfvars
+encode_expr
+If you rely on these functions, please refactor your code to work without them.
+
+S3 backend
+If you are using the S3 backend, please change your code as follows:
+
+If you are using the skip_s3_checksum option on the S3 backend, remove this option as OpenTofu does not need it.
+If you are using the endpoints → sso option or the AWS_ENDPOINT_URL environment variable, remove this option and verify if your code still works as intended after the migration.
+Removed block
+The OpenTofu removed block works differently from the Terraform variant. Please review the documentation and make the following changes:
+
+Remove the lifecycle block. If you used the lifecycle → destroy = true setting, remove the entire removed block. Verify that the code still works as intended after the migration.
+If you are using destroy-time provisioners with removed blocks, please restructure your code to work without them.
+Input variable validation
+If your input variable validation refers to other variables or objects, restructure your code to work around the necessity for these. (See issue #1336.)
+
+Testing changes
+If you are using the terraform test feature, you will need to perform the following changes:
+
+If you are using override_resource or override_data nested in a mock_provider restructure your tests to work without these features (see OpenTofu issue #1204).
+Step 6: Initialize OpenTofu
+Warning
+Should any of the following steps fail, please do not proceed and follow the rollback instructions below instead. If you suspect the failure may be the result of a bug in OpenTofu, please help us by opening an issue.
+
+Now you are ready to migrate. Run tofu init in the directory where your Terraform code resides. OpenTofu will download any providers and modules referenced in your configuration from the OpenTofu registry.
+
+Step 7: Inspect the plan
+Once initialized, run tofu plan and ensure that there are no pending changes similar to step 1 above. If there are unexpected changes in the plan, roll back to Terraform and troubleshoot your migration. (See the Troubleshooting section below.)
+
+Code Block
+$ tofu plan
+
+...
+
+No changes. Your infrastructure matches the configuration.
+
+OpenTofu has compared your real infrastructure against your
+configuration and found no differences, so no changes are needed.
+Step 8: Apply
+Even though there should be no changes in your infrastructure, you should run tofu apply to ensure that OpenTofu updates the state file.
